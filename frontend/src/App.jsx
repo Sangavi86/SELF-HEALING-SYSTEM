@@ -6,6 +6,7 @@ import Anomalies from './pages/Anomalies';
 import RootCause from './pages/RootCause';
 import Predictions from './pages/Predictions';
 import Healing from './pages/Healing';
+import Learning from './pages/Learning';
 import Logs from './pages/Logs';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Link to="/incidents" className="block p-2 rounded hover:bg-gray-200">Incidents</Link>
             <Link to="/predictions" className="block p-2 rounded hover:bg-gray-200">Predictions</Link>
             <Link to="/healing" className="block p-2 rounded hover:bg-gray-200">Healing</Link>
+            <Link to="/learning" className="block p-2 rounded hover:bg-gray-200">Learning</Link>
             <Link to="/logs" className="block p-2 rounded hover:bg-gray-200">Logs</Link>
           </nav>
         </aside>
@@ -37,6 +39,7 @@ function App() {
             <Route path="/incidents" element={<Incidents />} />
             <Route path="/predictions" element={<Predictions />} />
             <Route path="/healing" element={<Healing />} />
+            <Route path="/learning" element={<Learning />} />
             <Route path="/logs" element={<Logs />} />
           </Routes>
         </main>

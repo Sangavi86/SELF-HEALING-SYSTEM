@@ -47,6 +47,14 @@ app.use('/api/healing', createProxyMiddleware({
   },
 }));
 
+app.use('/api/learning', createProxyMiddleware({ 
+  target: 'http://localhost:5007', 
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/learning': '', // remove base path
+  },
+}));
+
 // Health Endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });

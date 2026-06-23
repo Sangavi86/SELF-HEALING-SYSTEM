@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const learningHistorySchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now },
-  modelId: { type: String, required: true },
-  trainingDataRef: { type: String },
-  accuracyImprovement: { type: Number },
-  loss: { type: Number },
-  epochsCompleted: { type: Number },
-  status: { type: String, enum: ['STARTED', 'COMPLETED', 'FAILED'], default: 'COMPLETED' }
+  rootCause: { type: String, required: true },
+  action: { type: String, required: true },
+  previousConfidence: { type: Number },
+  newConfidence: { type: Number },
+  reason: { type: String },
+  shei: { type: Number }
 });
 
 module.exports = mongoose.model('LearningHistory', learningHistorySchema);

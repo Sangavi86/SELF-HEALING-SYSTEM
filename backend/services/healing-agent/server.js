@@ -46,15 +46,38 @@ const processHealing = async () => {
 
       console.log(`[Healing] Processing Incident: ${incident._id} | Root Cause: ${incident.rootCause}`);
 
-      // 2. Recommendation Engine
-      const strategy = healingStrategies[incident.rootCause];
-      if (!strategy) {
-         console.log(`[Healing] Unknown root cause: ${incident.rootCause}. No strategy applied.`);
-         continue;
+      // 2. Recommendation Engine (Feedback Loop)
+      let strategyAction = null;
+      let risk = 'MEDIUM'; // fallback
+      let successProb = 0.5;
+
+      try {
+        const learningRes = await axios.get(`http://localhost:5007/best-action/${encodeURIComponent(incident.rootCause)}`);
+        if (learningRes.data && learningRes.data.bestAction) {
+          strategyAction = learningRes.data.bestAction;
+          // Use learned confidence to adjust probability
+          successProb = learningRes.data.recommendationConfidence || 0.5;
+          console.log(`[Healing] Learning Agent suggested: ${strategyAction} with conf: ${successProb}`);
+        }
+      } catch (err) {
+        console.log(`[Healing] Learning Agent unreachable or no data for ${incident.rootCause}. Using fallback.`);
       }
 
-      // Calculate Success Probability based on RCCS confidence
-      let successProb = strategy.baseSuccessProb * (incident.rccs || 0.8);
+      // Fallback if no learned strategy exists yet
+      const fallbackStrategy = healingStrategies[incident.rootCause];
+      if (!strategyAction) {
+        if (!fallbackStrategy) {
+           console.log(`[Healing] Unknown root cause: ${incident.rootCause}. No strategy applied.`);
+           continue;
+        }
+        strategyAction = fallbackStrategy.action;
+        successProb = fallbackStrategy.baseSuccessProb * (incident.rccs || 0.8);
+      }
+
+      // Keep risk definitions static from fallback logic if available, otherwise assume HIGH
+      risk = fallbackStrategy ? fallbackStrategy.riskLevel : 'HIGH';
+      const rollbackPlan = fallbackStrategy ? fallbackStrategy.rollbackPlan : 'Manual intervention required';
+
       successProb = Math.min(Math.max(successProb, 0.1), 0.99); // Clamp
 
       let approvalRequired = false;
