@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 const connectDB = require('../../shared/database/connectDB');
 const Incident = require('../../shared/database/models/Incident');
@@ -84,9 +85,8 @@ const processHealing = async () => {
       let status = 'PENDING';
 
       // 3. Safety Layer Rules
-      const risk = strategy.riskLevel;
       const confidence = incident.confidence || 0;
-
+ 
       if (risk === 'LOW') {
         approvalRequired = false;
       } else if (risk === 'MEDIUM') {
@@ -96,28 +96,28 @@ const processHealing = async () => {
       } else if (risk === 'CRITICAL') {
         approvalRequired = true;
       }
-
+ 
       if (approvalRequired) {
         status = 'REQUIRES_APPROVAL';
       } else {
         status = 'IN_PROGRESS';
       }
-
+ 
       const healingAction = new HealingAction({
         incidentId: incident._id,
         rootCause: incident.rootCause,
-        action: strategy.action,
-        recommendedAction: strategy.action,
+        action: strategyAction,
+        recommendedAction: strategyAction,
         riskLevel: risk,
         successProbability: successProb,
-        rollbackPlan: strategy.rollbackPlan,
+        rollbackPlan: rollbackPlan,
         approvalRequired: approvalRequired,
         status: status,
         startedAt: status === 'IN_PROGRESS' ? new Date() : null
       });
-
+ 
       await healingAction.save();
-      console.log(`[Healing] Created Action: ${strategy.action}. Status: ${status}`);
+      console.log(`[Healing] Created Action: ${strategyAction}. Status: ${status}`);
 
       // 4. If auto-executing, simulate it immediately
       if (status === 'IN_PROGRESS') {
