@@ -31,6 +31,22 @@ app.use('/api/anomaly', createProxyMiddleware({
   },
 }));
 
+app.use('/api/rootcause', createProxyMiddleware({ 
+  target: 'http://localhost:5005', 
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/rootcause': '', // remove base path
+  },
+}));
+
+app.use('/api/healing', createProxyMiddleware({ 
+  target: 'http://localhost:5006', 
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/healing': '', // remove base path
+  },
+}));
+
 // Health Endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });

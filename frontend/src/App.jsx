@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard';
 import Monitoring from './pages/Monitoring';
 import Incidents from './pages/Incidents';
 import Anomalies from './pages/Anomalies';
+import RootCause from './pages/RootCause';
 import Predictions from './pages/Predictions';
 import Healing from './pages/Healing';
 import Logs from './pages/Logs';
@@ -19,6 +20,7 @@ function App() {
             <Link to="/" className="block p-2 rounded hover:bg-gray-200">Dashboard</Link>
             <Link to="/monitoring" className="block p-2 rounded hover:bg-gray-200">Monitoring</Link>
             <Link to="/anomalies" className="block p-2 rounded hover:bg-gray-200">Anomalies</Link>
+            <Link to="/rootcause" className="block p-2 rounded hover:bg-gray-200">Root Cause</Link>
             <Link to="/incidents" className="block p-2 rounded hover:bg-gray-200">Incidents</Link>
             <Link to="/predictions" className="block p-2 rounded hover:bg-gray-200">Predictions</Link>
             <Link to="/healing" className="block p-2 rounded hover:bg-gray-200">Healing</Link>
@@ -31,6 +33,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/monitoring" element={<Monitoring />} />
             <Route path="/anomalies" element={<Anomalies />} />
+            <Route path="/rootcause" element={<RootCause />} />
             <Route path="/incidents" element={<Incidents />} />
             <Route path="/predictions" element={<Predictions />} />
             <Route path="/healing" element={<Healing />} />

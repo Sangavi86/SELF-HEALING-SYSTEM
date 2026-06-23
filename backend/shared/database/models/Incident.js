@@ -7,6 +7,10 @@ const incidentSchema = new mongoose.Schema({
   severity: { type: String, enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'], default: 'LOW' },
   status: { type: String, enum: ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'], default: 'OPEN' },
   rootCause: { type: String },
+  confidence: { type: Number },
+  rccs: { type: Number },
+  evidence: [{ type: String }],
+  analysisTimestamp: { type: Date },
   resolutionSteps: [{ type: String }],
   relatedAnomalies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Anomaly' }]
 });
