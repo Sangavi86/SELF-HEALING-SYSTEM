@@ -1,9 +1,15 @@
+process.on("uncaughtException", (err) => {
+  console.error("GLOBAL UNCAUGHT EXCEPTION:", err);
+});
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("GLOBAL UNHANDLED REJECTION at:", promise, "reason:", reason);
+});
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const axios = require('axios');
-
 const connectDB = require('../../shared/database/connectDB');
 const Incident = require('../../shared/database/models/Incident');
 const HealingAction = require('../../shared/database/models/HealingAction');
@@ -16,7 +22,18 @@ const PORT = process.env.PORT || 5006;
 app.use(cors());
 app.use(express.json());
 
-connectDB();
+const startServer = async () => {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error("Database connection failed asynchronously during startup:", err);
+  }
+};
+startServer();
+
+
+
+
 
 // Healing Strategy Map
 const healingStrategies = {
@@ -226,7 +243,6 @@ app.post('/execute-healing', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 app.listen(PORT, () => {
   console.log(`Healing Agent running on port ${PORT}`);
 });

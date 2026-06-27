@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, Cpu, HardDrive, Network } from 'lucide-react';
 
-const MetricCard = ({ title, value, unit, icon: Icon, colorClass }) => (
-  <div className="bg-white rounded-lg shadow p-6 flex items-center space-x-4">
-    <div className={`p-3 rounded-full ${colorClass}`}>
-      <Icon className="w-6 h-6 text-white" />
+const MetricCard = ({ title, value, unit, icon: Icon, colorClass }) => {
+  const displayValue = typeof value === 'number' && !isNaN(value) ? value.toFixed(1) : '--';
+  return (
+    <div className="bg-white rounded-lg shadow p-6 flex items-center space-x-4">
+      <div className={`p-3 rounded-full ${colorClass}`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+      <div>
+        <p className="text-gray-500 text-sm font-medium">{title}</p>
+        <p className="text-2xl font-bold text-gray-800">{displayValue}{unit}</p>
+      </div>
     </div>
-    <div>
-      <p className="text-gray-500 text-sm font-medium">{title}</p>
-      <p className="text-2xl font-bold text-gray-800">{value !== undefined ? value.toFixed(1) : '--'}{unit}</p>
-    </div>
-  </div>
-);
+  );
+};
 
 export default function Monitoring() {
   const [metrics, setMetrics] = useState([]);
@@ -25,17 +28,32 @@ export default function Monitoring() {
       if (!res.ok) throw new Error('Failed to fetch metrics');
       const data = await res.json();
       
+      console.log("Metrics raw data:", data);
+      console.log("Is array:", Array.isArray(data));
+      if (Array.isArray(data) && data.length > 0) {
+        console.log("First item:", data[0]);
+      }
+
+      if (!Array.isArray(data)) {
+        throw new TypeError("Metrics API response is not an array");
+      }
+      
       // Data arrives descending by time (newest first). Recharts likes ascending for X-axis.
-      const chartData = data.map(d => ({
-        ...d,
-        timeLabel: new Date(d.timestamp).toLocaleTimeString()
-      })).reverse();
+      const chartData = data.map(d => {
+        const date = d.timestamp ? new Date(d.timestamp) : null;
+        const timeLabel = (date && !isNaN(date.getTime())) ? date.toLocaleTimeString() : 'N/A';
+        return {
+          ...d,
+          timeLabel
+        };
+      }).reverse();
       
       setMetrics(chartData);
-      setLatest(data[0]);
+      setLatest(data[0] || null);
       setError(null);
     } catch (err) {
-      console.error(err);
+      console.error("Monitoring Error:", err);
+      console.error(err.stack);
       setError('Could not load monitoring data.');
     }
   };
